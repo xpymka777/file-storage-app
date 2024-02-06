@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { FileEntity } from '../file/file.entity';
+import { UserEntity } from '../user/user.entity';
 
 @Entity()
 export class FolderEntity {
@@ -8,6 +16,12 @@ export class FolderEntity {
   @Column()
   name: string;
 
+  @ManyToOne(() => UserEntity, (user) => user.folders)
+  user: UserEntity;
+
   @Column()
   parentId: string;
+
+  @OneToMany(() => FileEntity, (file) => file.folder)
+  files: FileEntity[];
 }

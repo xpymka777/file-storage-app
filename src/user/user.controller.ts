@@ -29,8 +29,10 @@ export class UserController {
   @Post('login')
   async login(
     @Body() loginDto: { username: string; password: string },
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Res({ passthrough: true }) response: Response & { cookie: Function }, // Используем { cookie: Function }
+    @Res({ passthrough: true })
+    response: Response & {
+      cookie: (name: string, value: string, options?: any) => void;
+    },
   ) {
     const user = await this.userService.validateUser(
       loginDto.username,

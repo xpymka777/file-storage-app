@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { FolderEntity } from '../folder/folder.entity';
 
 @Entity()
 export class FileEntity {
@@ -10,4 +11,7 @@ export class FileEntity {
 
   @Column()
   filepath: string;
+
+  @ManyToOne(() => FolderEntity, (folder) => folder.files)
+  folder: FolderEntity;
 }
