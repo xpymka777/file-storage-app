@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm'; // Добавьте FindOneOptions
+import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -34,5 +34,16 @@ export class UserService {
     return this.userRepository.findOne({
       where: { username },
     });
+  }
+
+  async validateUser(
+    username: string,
+    password: string,
+  ): Promise<UserEntity | null> {
+    const user = await this.userRepository.findOne({ where: { username } });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      return user;
+    }
+    return null;
   }
 }
