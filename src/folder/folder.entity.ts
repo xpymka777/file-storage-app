@@ -19,7 +19,7 @@ export class FolderEntity {
   @ManyToOne(() => UserEntity, (user) => user.folders)
   user: UserEntity;
 
-  @Column()
+  @Column({ nullable: true })
   parentId: string;
 
   @OneToMany(() => FileEntity, (file) => file.folder)

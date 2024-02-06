@@ -4,6 +4,8 @@ import { UserEntity } from './user/user.entity';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { JwtModule } from '@nestjs/jwt';
+import { FolderEntity } from './folder/folder.entity';
+import { FileEntity } from './file/file.entity';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { JwtModule } from '@nestjs/jwt';
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, FolderEntity, FileEntity]),
     JwtModule.register({
       secret: '123321',
       signOptions: { expiresIn: '1h' },

@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { FolderEntity } from '../folder/folder.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(FolderEntity)
+    private readonly folderRepository: Repository<FolderEntity>,
   ) {}
 
   async registration(userDto: {
@@ -16,18 +19,36 @@ export class UserService {
     password: string;
   }): Promise<UserEntity> {
     const existingUser = await this.userRepository.findOne({
-      where: { username: userDto.username }, // Используйте where для поиска по username
+      where: { username: userDto.username },
     });
+
     if (existingUser) {
-      throw new UnauthorizedException('Username is already taken');
+      throw new UnauthorizedException('Имя пользователя занято.');
     }
 
     const hashedPassword = await bcrypt.hash(userDto.password, 10);
+
+    // Создание пользователя
     const user = new UserEntity();
     user.username = userDto.username;
     user.password = hashedPassword;
 
-    return this.userRepository.save(user);
+    // Сохранение пользователя
+    const savedUser = await this.userRepository.save(user);
+
+    // Создание корневой папки для нового пользователя с привязкой к пользователю
+    const rootFolder = new FolderEntity();
+    rootFolder.name = 'root';
+    rootFolder.parentId = null;
+    rootFolder.user = savedUser;
+
+    // Передача id пользователя корневой папке
+    rootFolder.user = await Promise.resolve(savedUser);
+
+    // Сохранение корневой папки
+    await this.folderRepository.save(rootFolder);
+
+    return savedUser;
   }
 
   async findOne(username: string): Promise<UserEntity | undefined> {
