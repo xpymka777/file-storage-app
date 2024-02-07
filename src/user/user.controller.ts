@@ -41,7 +41,7 @@ export class UserController {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { username: user.username, sub: user.id };
+    const payload = { username: user.username, userId: user.id };
 
     // Устанавливаем токен в куки
     response.cookie('access_token', this.jwtService.sign(payload), {
