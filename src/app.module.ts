@@ -6,6 +6,8 @@ import { UserService } from './user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { FolderEntity } from './folder/folder.entity';
 import { FileEntity } from './file/file.entity';
+import { FolderController } from './folder/folder.controller';
+import { FolderService } from './folder/folder.service';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { FileEntity } from './file/file.entity';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  controllers: [UserController],
-  providers: [UserService],
+  controllers: [UserController, FolderController],
+  providers: [UserService, FolderService],
 })
 export class AppModule {}
