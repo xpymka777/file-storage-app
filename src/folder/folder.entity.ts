@@ -24,4 +24,7 @@ export class FolderEntity {
 
   @OneToMany(() => FileEntity, (file) => file.folder)
   files: FileEntity[];
+
+  @Column({ nullable: true })
+  userId: string;
 }

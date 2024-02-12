@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FolderEntity } from './folder.entity';
+import { UserEntity } from '../user/user.entity'; // Импортируем UserRepository
 
 @Injectable()
 export class FolderService {
   constructor(
     @InjectRepository(FolderEntity)
     private readonly folderRepository: Repository<FolderEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>, // Инжектируем UserRepository
   ) {}
 
   async createFolder(
@@ -17,7 +20,13 @@ export class FolderService {
   ): Promise<FolderEntity> {
     const folder = new FolderEntity();
     folder.name = name;
-    folder.user = { id: userId } as any;
+    const user = await this.userRepository.findOne({
+      where: { id: Number(userId) },
+    }); // Получить пользователя по userId
+    if (!user) {
+      throw new Error('Пользователь не найден');
+    }
+    folder.user = user; // Установить свойство "user"
     folder.parentId = parentId;
     return await this.folderRepository.save(folder);
   }

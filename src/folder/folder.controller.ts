@@ -1,10 +1,25 @@
-import { Controller, Post, Body, Param, Patch, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { FolderService } from './folder.service';
 import { Request } from 'express';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FolderEntity } from './folder.entity';
+import { Repository } from 'typeorm';
 
 @Controller('folders')
 export class FolderController {
-  constructor(private readonly folderService: FolderService) {}
+  constructor(
+    private readonly folderService: FolderService,
+    @InjectRepository(FolderEntity) // Внедряем FolderEntity
+    private readonly folderRepository: Repository<FolderEntity>, // Внедряем Repository<FolderEntity>
+  ) {}
 
   @Post('/create')
   async createFolder(
@@ -12,9 +27,6 @@ export class FolderController {
     @Body('name') name: string,
     @Body('parentId') parentId: string,
   ) {
-    if (!request.cookies || typeof request.cookies !== 'object') {
-      throw new Error('Куки не найдены в запросе.');
-    }
     const userId = request.cookies['userId']; // Получаем userId из куков
     // Проверка на наличие userId в куках или его соответствие
     if (!userId || userId !== request.cookies['userId']) {
@@ -22,10 +34,19 @@ export class FolderController {
         'Пользователь не авторизован или у пользователя нет доступа.',
       );
     }
-    // Проверка на parentId на null
-    if (parentId === null) {
+    const parentFolder = await this.folderRepository.findOne({
+      where: { id: parentId, userId },
+    });
+    if (!parentFolder) {
+      throw new UnauthorizedException(
+        'Родительская папка не принадлежит пользователю.',
+      );
+    }
+    // Проверка parentId на null
+    if (!parentId) {
       throw new Error('Укажите родительскую папку.');
     }
+    // Создание папки
     return await this.folderService.createFolder(userId, name, parentId);
   }
 
@@ -35,14 +56,18 @@ export class FolderController {
     @Param('id') id: string,
     @Body('name') name: string,
   ) {
-    if (!request.cookies || typeof request.cookies !== 'object') {
-      throw new Error('Куки не найдены в запросе.');
-    }
     const userId = request.cookies['userId']; // Получаем userId из куков
     // Проверка на наличие userId в куках или его соответствие
     if (!userId || userId !== request.cookies['userId']) {
       throw new Error(
         'Пользователь не авторизован или у пользователя нет доступа.',
+      );
+    }
+    const folder = await this.folderRepository.findOneOrFail({ where: { id } });
+
+    if (folder.userId !== userId) {
+      throw new Error(
+        'У вас нет разрешения на выполнение этого действия для указанной папки.',
       );
     }
     // Проверка на изменение названия root папки
@@ -58,14 +83,18 @@ export class FolderController {
     @Param('id') id: string,
     @Body('parentId') parentId: string,
   ) {
-    if (!request.cookies || typeof request.cookies !== 'object') {
-      throw new Error('Куки не найдены в запросе.');
-    }
     const userId = request.cookies['userId']; // Получаем userId из куков
     // Проверка на наличие userId в куках или его соответствие
     if (!userId || userId !== request.cookies['userId']) {
       throw new Error(
         'Пользователь не авторизован или у пользователя нет доступа.',
+      );
+    }
+    const folder = await this.folderRepository.findOneOrFail({ where: { id } });
+
+    if (folder.userId !== userId) {
+      throw new Error(
+        'У вас нет разрешения на выполнение этого действия для указанной папки.',
       );
     }
     // Проверка на установку parentId в null

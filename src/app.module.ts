@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './user/user.entity';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
 import { JwtModule } from '@nestjs/jwt';
+
+import { UserEntity } from './user/user.entity';
 import { FolderEntity } from './folder/folder.entity';
 import { FileEntity } from './file/file.entity';
+
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
 import { FolderController } from './folder/folder.controller';
 import { FolderService } from './folder/folder.service';
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
