@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileEntity } from './file.entity';
 import { FolderEntity } from '../folder/folder.entity';
-import { createWriteStream, mkdirSync, existsSync } from 'fs';
+import { createWriteStream, mkdirSync, existsSync, unlinkSync } from 'fs';
 import * as path from 'path';
 import { UserEntity } from '../user/user.entity';
 
@@ -53,5 +53,27 @@ export class FileService {
       user: user,
     };
     return this.fileRepository.save(newFile);
+  }
+
+  async deleteFile(fileId: string): Promise<FileEntity | null> {
+    const file = await this.fileRepository.findOne({ where: { id: fileId } });
+
+    if (!file) {
+      return null;
+    }
+
+    try {
+      // Удаление с сервера
+      const filePath = path.join(process.cwd(), file.filepath);
+      unlinkSync(filePath);
+
+      // Удаление с бд
+      await this.fileRepository.remove(file);
+
+      return file;
+    } catch (error) {
+      console.error('Ошибка при удалении файла:', error);
+      throw new Error('Ошибка при удалении файла');
+    }
   }
 }
