@@ -1,6 +1,5 @@
 import { Injectable, UploadedFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { Repository } from 'typeorm';
 import { FileEntity } from './file.entity';
 import { FolderEntity } from '../folder/folder.entity';
@@ -40,8 +39,11 @@ export class FileService {
     if (!existsSync(uploadsFolder)) {
       mkdirSync(uploadsFolder);
     }
-    const newFilePath = path.join(uploadsFolder, file.originalname);
-    const fileWriteStream = createWriteStream(newFilePath);
+    const fileName = `${Date.now()}-${file.originalname}`;
+    const newFilePath = `uploads/${fileName}`;
+    const fileWriteStream = createWriteStream(
+      path.join(process.cwd(), newFilePath),
+    );
     fileWriteStream.write(file.buffer);
     const newFile: Partial<FileEntity> = {
       name: file.originalname,
