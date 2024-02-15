@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileEntity } from './file.entity';
 import { FolderEntity } from '../folder/folder.entity';
-import { createWriteStream } from 'fs';
+import { createWriteStream, mkdirSync, existsSync } from 'fs';
 import * as path from 'path';
 import { UserEntity } from '../user/user.entity';
 
@@ -27,21 +27,21 @@ export class FileService {
       where: { id: folderId },
     });
     if (!folder) {
-      throw new Error('Folder not found');
+      throw new Error('Укажите папку');
     }
-
     const user = await this.userRepository.findOne({
       where: { id: Number(userId) },
     });
-
     if (!user) {
-      throw new Error('User not found');
+      throw new Error('Не авторизован!');
     }
-
-    const newFilePath = path.join(process.cwd(), 'uploads', file.originalname);
+    const uploadsFolder = path.join(process.cwd(), 'uploads');
+    if (!existsSync(uploadsFolder)) {
+      mkdirSync(uploadsFolder);
+    }
+    const newFilePath = path.join(uploadsFolder, file.originalname);
     const fileWriteStream = createWriteStream(newFilePath);
     fileWriteStream.write(file.buffer);
-
     const newFile: Partial<FileEntity> = {
       name: file.originalname,
       filepath: newFilePath,
@@ -49,7 +49,6 @@ export class FileService {
       folderId: folder.id,
       user: user,
     };
-
     return this.fileRepository.save(newFile);
   }
 }
