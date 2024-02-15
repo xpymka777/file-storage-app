@@ -10,6 +10,8 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { FolderController } from './folder/folder.controller';
 import { FolderService } from './folder/folder.service';
+import { FileController } from './file/file.controller';
+import { FileService } from './file/file.service';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -28,7 +30,7 @@ import { FolderService } from './folder/folder.service';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  controllers: [UserController, FolderController],
-  providers: [UserService, FolderService],
+  controllers: [UserController, FolderController, FileController],
+  providers: [UserService, FolderService, FileService],
 })
 export class AppModule {}
