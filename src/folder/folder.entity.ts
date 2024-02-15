@@ -11,20 +11,20 @@ import { UserEntity } from '../user/user.entity';
 @Entity()
 export class FolderEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: string; // Уникальный идентификатор папки, генерируемый автоматически
 
   @Column()
-  name: string;
+  name: string; // Наименование папки
 
   @ManyToOne(() => UserEntity, (user) => user.folders)
-  user: UserEntity;
+  user: UserEntity; // Связь между папкой и пользователем, которому она принадлежит
 
   @Column({ nullable: true })
-  parentId: string;
+  parentId: string; // Идентификатор родительской папки, если есть
 
   @OneToMany(() => FileEntity, (file) => file.folder)
-  files: FileEntity[];
+  files: FileEntity[]; // Связь между папкой и файлами, которые она содержит
 
   @Column({ nullable: true })
-  userId: string;
+  userId: string; // Идентификатор пользователя, которому принадлежит папка
 }

@@ -5,17 +5,17 @@ import { FileEntity } from '../file/file.entity';
 @Entity()
 export class UserEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number; // Уникальный идентификатор пользователя, генерируемый автоматически
 
   @Column()
-  username: string;
+  username: string; // Имя пользователя
 
   @Column()
-  password: string;
+  password: string; // Пароль пользователя
 
   @OneToMany(() => FolderEntity, (folder) => folder.user)
-  folders: FolderEntity[];
+  folders: FolderEntity[]; // Связь между пользователем и папками, которые ему принадлежат
 
-  @OneToMany(() => FileEntity, (file) => file.user) // Определение отношения OneToMany с FileEntity
-  files: FileEntity[]; // Добавление свойства files
+  @OneToMany(() => FileEntity, (file) => file.user)
+  files: FileEntity[]; // Связь между пользователем и файлами, которые им созданы или принадлежат ему
 }
