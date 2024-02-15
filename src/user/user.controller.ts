@@ -9,7 +9,9 @@ import {
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('User')
 @Controller('users')
 export class UserController {
   constructor(

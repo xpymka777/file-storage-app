@@ -7,6 +7,7 @@ async function bootstrap() {
   // Используйте cookie-parser
   app.use(cookieParser());
   app.use('/uploads', express.static('uploads'));
+  await AppModule.setupSwagger(app);
   await app.listen(3000);
 }
 

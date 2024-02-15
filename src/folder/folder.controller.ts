@@ -14,7 +14,9 @@ import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FolderEntity } from './folder.entity';
 import { Repository } from 'typeorm';
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Folders')
 @Controller('folders')
 export class FolderController {
   constructor(
