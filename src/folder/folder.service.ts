@@ -49,4 +49,11 @@ export class FolderService {
     folder.parentId = newParentId;
     return await this.folderRepository.save(folder);
   }
+
+  async getFolderContent(folderId: string): Promise<FolderEntity | null> {
+    return await this.folderRepository.findOne({
+      where: { id: folderId },
+      relations: ['files', 'user.folders'],
+    });
+  }
 }

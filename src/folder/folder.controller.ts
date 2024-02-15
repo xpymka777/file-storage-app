@@ -7,6 +7,7 @@ import {
   Req,
   UnauthorizedException,
   NotFoundException,
+  Get,
 } from '@nestjs/common';
 import { FolderService } from './folder.service';
 import { Request } from 'express';
@@ -120,5 +121,12 @@ export class FolderController {
     await this.folderRepository.save(folder);
 
     return folder;
+  }
+
+  @Get(':id/content')
+  async getFolderContent(
+    @Param('id') folderId: string,
+  ): Promise<FolderEntity | null> {
+    return await this.folderService.getFolderContent(folderId);
   }
 }
